@@ -6,19 +6,21 @@ plot(stores,
 cor(stores)
 
 #Checking equal variance
-raw_lm <- lm(data=stores,
-           formula=Store_Sales~Store_Area+Items_Available+Daily_Customer_Count)
+regression_model_1 <- lm(data=stores,
+                    formula=Store_Sales~
+                      Store_Area+Items_Available+Daily_Customer_Count)
 
 plot(
-  fitted(raw_lm), 
-  resid(raw_lm),
+  fitted(regression_model_1), 
+  resid(regression_model_1),
   main = "Residuals vs Fitted Values",
   xlab = "Fitted Values",
   ylab = "Residuals")
 abline(0,0)
 
 #Checking normality
-qqnorm(raw_lm$residuals, 
+qqnorm(regression_model_1$residuals, 
        datax = TRUE)
-qqline(raw_lm$residuals, 
+qqline(regression_model_1$residuals, 
        datax = TRUE)
+ 
