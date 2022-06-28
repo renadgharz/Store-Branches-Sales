@@ -6,10 +6,6 @@ plot(stores,
 cor(stores)
 
 #Checking equal variance
-regression_model_1 <- lm(data=stores,
-                    formula=Store_Sales~
-                      Store_Area+Items_Available+Daily_Customer_Count)
-
 plot(
   fitted(regression_model_1), 
   resid(regression_model_1),
