@@ -6,6 +6,19 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
 ```
 
+# 1. Overview of Data
+
+# 2. Exploratory Analysis
+
+# 3. Model 1 - Raw Data
+
+# 4. Model 2 - Log-Transformed Data
+
+# 5. Model 3 - Data Without Outliers
+
+# 6. Conclusion

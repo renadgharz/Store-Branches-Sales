@@ -1,5 +1,7 @@
 stores_summary <- summary(stores)
-stores2_summary <- summary(stores2)
-
 boxplot(stores)
+hist(stores)
+
+stores2_summary <- summary(stores2)
 boxplot(stores2)
+hist(stores2)
