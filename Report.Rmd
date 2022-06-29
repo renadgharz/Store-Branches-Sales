@@ -1,6 +1,6 @@
 ---
 title: "Store Branches Sales Analysis"
-author: "Renad Gharzeddine"
+author: "Renad Gharz"
 date: "19/06/2022"
 output: pdf_document
 ---
@@ -12,6 +12,16 @@ library(RColorBrewer)
 ```
 
 # 1. Overview of Data
+
+The data sample consists of 4 continuous quantitative variables and 896 total observations. 
+
+The __Store_Area__ variable represents the physical area of the store. The values are originally given in square yards $({yd}^2)$, however, for better readability, it was converted to squared feet $({ft}^2)$ by multiplying the squared yards values by 9.
+
+The __Items_Available__ variable represents the number of different items available in the store.
+
+The __Daily_Customer_Count__ variable represents the average number of customers who visited the store in a month.
+
+the __Stores_Sales__ variable represents the sales made in a store, in USD currency.
 
 # 2. Exploratory Analysis
 
