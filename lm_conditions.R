@@ -19,4 +19,4 @@ qqnorm(regression_model_1$residuals,
        datax = TRUE)
 qqline(regression_model_1$residuals, 
        datax = TRUE)
- 
+
