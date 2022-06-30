@@ -1,5 +1,7 @@
 
 stores_summary <- summary(stores)
+stores_statistics <- describeBy(stores)
+
 boxplot(stores)
 
 boxplot(stores$Store_Area)

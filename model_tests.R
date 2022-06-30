@@ -13,5 +13,6 @@ regression_model_2 <- lm(data=stores2,
                            Store_Area+Items_Available+Daily_Customer_Count)
 
 model_2_summary <- summary(regression_model_2)
+model_2_summary
 model_2_summary$coefficients
 model_2_summary$r.squared

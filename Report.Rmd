@@ -9,11 +9,13 @@ output: pdf_document
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
+library(psych)
+library(car)
 ```
 
 # 1. Overview of Data
 
-The data sample consists of 4 continuous quantitative variables and 896 total observations. 
+The data sample consists of 4 continuous quantitative variables and 896 total observations. The purpose of this analysis is to build a regression model to predict the store's sales in USD using the store area, the items available, and the daily customer count (average) as predictor variables.
 
 The __Store_Area__ variable represents the physical area of the store. The values are originally given in square yards $({yd}^2)$, however, for better readability, it was converted to squared feet $({ft}^2)$ by multiplying the squared yards values by 9.
 
@@ -23,12 +25,121 @@ The __Daily_Customer_Count__ variable represents the average number of customers
 
 the __Stores_Sales__ variable represents the sales made in a store, in USD currency.
 
+```{r overview, echo=FALSE}
+stores <- read.csv("Stores.csv")
+stores <- stores %>% select(-ï..Store.ID)
+stores$Store_Area <- stores$Store_Area * 9
+head(stores)
+```
+
 # 2. Exploratory Analysis
+Central tendencies of the sample:
+```{r central_tendencies, echo=FALSE}
+stores_summary <- summary(stores)
+print(stores_summary)
+```
+
+From the central tendencies table above, we can see that the means medians of all 4 variables are relatively equal indicating that the sample data is relatively symmetrical. We can further confirm this by looking at the shape of each variable's histogram which support the relative symmetry claim.
+
+```{r histograms, echo=FALSE}
+hist(stores$Store_Area, breaks = 15)
+hist(stores$Items_Available, breaks = 15)
+hist(stores$Daily_Customer_Count, breaks = 15)
+hist(stores$Store_Sales, breaks = 15)
+```
+
+As shown in the histograms, the data is still symmetrically distributed. Although we can see a few outlier points on some of the histograms, they are negligible and do not dramatically skew or influence th shape of the data distribution. Thus, we can assume that the sample meets the relative normality condition of a linear regression model.
+
+Descriptive statistics of the sample:
+```{r descriptive_stats, echo=FALSE}
+stores_statistics <- describeBy(stores)
+print(stores_statistics)
+```
+
+The descriptive statistics also support this as the skew factors are fairly low for 3 of the 4 variables, with the store sales variable being the exception having a 0.15 skew, which is still an acceptable level.
+
+```{r scatterplots, echo=FALSE}
+plot(stores,
+     main="Scatterplot Matrix",
+     col="grey",
+     pch=4)
+cor(stores)
+```
+
+The scatterplot matrix shows that apart from one relation (Store_Area-Items_Available), the remaining predictor variables have little to no linear relationship with the response variable, which could result in a less accurate regression model (due to collinearity). This is further backed up by the correlation table which indicates low correlation between most of the variables.
 
 # 3. Model 1 - Raw Data
 
-# 4. Model 2 - Log-Transformed Data
+In order to make sure that we end up with the most accurate model with the highest prediction power, a few different models will be built with various adjustments. Model 1 is the simplest model and will use the raw data without any transformations (except for the square yards to square feet conversions for Store_Area).
 
-# 5. Model 3 - Data Without Outliers
+```{r model1}
+regression_model_1 <- 
+  lm(data=stores,
+     formula=
+       Store_Sales~Store_Area+Items_Available+Daily_Customer_Count)
 
-# 6. Conclusion
+model_1_summary <- summary(regression_model_1)
+model_1_summary
+model_1_summary$coefficients
+model_1_summary$adj.r.squared
+```
+
+Since this is a multiple regression (more than 1 predictor variable), it is better to use the adjusted R-squared than the multiple R-squared. As we add more predictor variables to models, the R-squared will always go up, thus we need to compensate for this to make sure our model is not inaccurate, thus we would use the adjusted R-squared which accounts for every additional predictor variable added, giving us a more accurate estimation of the model's prediction accuracy.
+
+The R-squared measures how much variance the model accounts for, thus the higher the value, the better the model will be at predicting the response variable. The adjusted R-squared is 0.073% which is extremely low, indicating that the model has almost no prediction power to accurately regress the response variable.
+
+As suspected previously, collinearity seems to be a factor here as the __Store_Area__ and the __Items_Available__ predictors are almost perfectly correlated. This pairwise collinearity is affecting how we interpret the coefficients, which is why the Store_Area coefficient is negative which does not make sense from a domain perspective.
+
+We can verify this property by looking at the Variance Inflation Factor of model's predictors.
+
+```{r vif}
+vif(regression_model_1)
+```
+
+As shown, the 2 correlated predictors demonstrate a very high VIF (greater than 10), which indicates multicollinearity in the model. In order to make the model more parsimonuous, we can run new models by dropping one of those 2 collinear variables to improve the model.
+
+# 4. Model 2 - Adjusting for Collinearity
+
+In Model 2, we will compare 2 submodels in which one of the 2 collinear variables will be dropped in each model to see which one demonstrates better prediction power.
+
+## 4.1 Dropping Store_Area
+We will first drop the __Store_Area__ variable.
+
+```{r store_area drop}
+stores2 <- stores %>% select(-Store_Area)
+
+regression_model_2 <- lm(data=stores2,
+                         formula=
+                           Store_Sales~Items_Available+Daily_Customer_Count)
+
+model_2_summary <- summary(regression_model_2)
+model_2_summary
+model_2_summary$coefficients
+model_2_summary$adj.r.squared
+```
+
+In this new model we can see that the adjusted R-squared has minutely improved over the model that used the raw data to 0.077%, however this model is still not good enough.
+
+## 4.2 Dropping Items_Available
+We can now move on to dropping the __Items_Available__ variable.
+
+```{r items_avail_drop}
+stores3 <- stores %>% select(-Items_Available)
+
+regression_model_3 <- lm(data=stores3,
+                         formula=
+                           Store_Sales~Store_Area+Daily_Customer_Count)
+
+model_3_summary <- summary(regression_model_3)
+model_3_summary
+model_3_summary$coefficients
+model_3_summary$adj.r.squared
+```
+
+Although this model has an improved adjusted R-squared, it is negligible compared to the original model and not as good as the model where we dropped __Store_Area__. Because the model is still not satisfactory and we know that the relationship between the predictors and the response variables is very weak. We can perform some transformations on the data to try to linearize the non-linear relationships.
+
+# 5. Model 3 - Log-Transformed Data
+
+# 6. Model 4 - Data Without Outliers
+
+# 7. Conclusion
